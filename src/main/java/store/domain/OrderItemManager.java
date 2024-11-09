@@ -23,4 +23,17 @@ public class OrderItemManager {
         return Collections.unmodifiableList(items);
     }
 
+    public void updateOrderItemPlusPromotion(String itemName) {
+        items.stream()
+                .filter(item -> item.hasName(itemName))
+                .findFirst()
+                .ifPresent(OrderItem::receivePromotion);
+    }
+
+    public void updateOrderItemAdjustment(String productName, int quantity) {
+        items.stream()
+                .filter(item -> item.hasName(productName))
+                .findFirst()
+                .ifPresent(item -> item.adjustmentQuantity(quantity));
+    }
 }
