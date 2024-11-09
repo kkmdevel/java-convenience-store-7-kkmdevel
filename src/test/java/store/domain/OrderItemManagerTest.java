@@ -32,4 +32,21 @@ public class OrderItemManagerTest {
         List<OrderItem> items = orderItemManager.getItems();
         assertThrows(UnsupportedOperationException.class, () -> items.add(OrderItem.of("사이다", 3)));
     }
+
+
+    @Test
+    @DisplayName("updateOrderItemPlusPromotion 메서드 테스트 - 해당 아이템의 수량을 1 증가시킨다.")
+    void updateOrderItemPlusPromotionTest() {
+        OrderItemManager orderItemManager = OrderItemManager.from(Map.of("콜라", 5));
+        orderItemManager.updateOrderItemPlusPromotion("콜라");
+        assertThat(orderItemManager.getItems().getFirst().getRequestedQuantity()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("updateOrderItemAdjustment 메서드 테스트 - 해당 아이템의 수량을 지정한 만큼 감소시킨다.")
+    void updateOrderItemAdjustmentTest() {
+        OrderItemManager orderItemManager = OrderItemManager.from(Map.of("사이다", 5));
+        orderItemManager.updateOrderItemAdjustment("사이다", 2);
+        assertThat(orderItemManager.getItems().getFirst().getRequestedQuantity()).isEqualTo(3);
+    }
 }
