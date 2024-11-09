@@ -21,24 +21,28 @@ public class Promotion {
         return new Promotion(name, buyQuantity, getQuantity, startDate, endDate);
     }
 
-    public String getName() {
-        return name;
+    public boolean isNameEqualTo(String promotionName) {
+        return this.name.equals(promotionName);
     }
 
-    public int getBuyQuantity() {
-        return buyQuantity;
+    public boolean isBuyQuantityEqualTo(int quantity) {
+        return this.buyQuantity == quantity;
     }
 
-    public int getGetQuantity() {
-        return getQuantity;
+    public boolean isGetQuantityEqualTo(int quantity) {
+        return this.getQuantity == quantity;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public boolean isStartDateEqualTo(LocalDate date) {
+        return this.startDate.equals(date);
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public boolean isEndDateEqualTo(LocalDate date) {
+        return this.endDate.equals(date);
+    }
+
+    public int calculatePromotionQuantity() {
+        return buyQuantity + getQuantity;
     }
 
     public boolean isActive(LocalDate currentDate) {
