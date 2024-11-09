@@ -12,8 +12,7 @@ public class ParserTest {
 
     @ParameterizedTest
     @CsvSource({
-            "123, 123",
-            "-456, -456"
+            "123, 123", "-456, -456"
     })
     @DisplayName("올바른 정수 변환 테스트")
     void testParseStringToInt_ValidInput(String input, int expected) {
@@ -45,9 +44,16 @@ public class ParserTest {
 
     @ParameterizedTest
     @CsvSource({
-            "abc",
-            "''",
-            "' '"
+            "'Y', true", "'N', false"
+    })
+    @DisplayName("올바른 Y/N 입력 테스트")
+    void testParseYesNo_ValidInput(String input, boolean expected) {
+        assertEquals(expected, Parser.parseYesNo(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "abc", "''", "' '"
     })
     @DisplayName("잘못된 정수 변환 예외 테스트")
     void testParseStringToInt_InvalidInput(String input) {
@@ -56,14 +62,20 @@ public class ParserTest {
 
     @ParameterizedTest
     @CsvSource({
-            "2024/11/07",
-            "07-11-2024",
-            "''",
-            "' '"
+            "2024/11/07", "07-11-2024", "''", "' '"
     })
     @DisplayName("잘못된 날짜 변환 예외 테스트")
     void testParseStringToLocalDate_InvalidInput(String input) {
         assertThrows(IllegalArgumentException.class, () -> Parser.parseStringToLocalDate(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'A'", "'yes'", "'no'", "' '", "''"
+    })
+    @DisplayName("잘못된 Y/N 입력 예외 테스트")
+    void testParseYesNo_InvalidInput(String input) {
+        assertThrows(IllegalArgumentException.class, () -> Parser.parseYesNo(input));
     }
 
 }
