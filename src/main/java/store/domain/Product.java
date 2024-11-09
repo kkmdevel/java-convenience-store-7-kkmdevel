@@ -3,7 +3,7 @@ package store.domain;
 public class Product {
     private final String name;
     private final int price;
-    private final int quantity;
+    private int quantity;
     private final String promotion;
 
     private Product(String name, int price, int quantity, String promotion) {
@@ -25,11 +25,23 @@ public class Product {
         return price;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
     public String getPromotion() {
         return promotion;
+    }
+
+    public boolean hasName(String productName) {
+        return this.name.equals(productName);
+    }
+
+    public int availableQuantity() {
+        return this.quantity;
+    }
+
+    public boolean hasPromotion() {
+        return this.promotion != null && !this.promotion.equals("null");
+    }
+
+    public int calculatePrice(int requestedQuantity) {
+        return price * requestedQuantity;
     }
 }
