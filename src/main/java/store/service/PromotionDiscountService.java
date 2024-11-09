@@ -2,6 +2,7 @@ package store.service;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import store.domain.OrderItem;
@@ -19,6 +20,18 @@ public class PromotionDiscountService {
         this.promotionManager = promotionManager;
         this.currentDate = LocalDate.from(DateTimes.now());
     }
+
+    public List<OrderItem> findCanReceiveBonus(OrderItemManager orderItemManager) {
+        return orderItemManager.getItems().stream()
+                .filter(item -> {
+                    int promotionQuantity = getPromotionQuantity(item);
+                    int promotionStock = productManager.getPromotionStock(item.getName());
+                    return item.getRequestedQuantity() % promotionQuantity == promotionQuantity - 1
+                            && item.getRequestedQuantity() + 1 <= promotionStock;
+                })
+                .toList();
+    }
+
 
     public Map<String, Integer> calculateBonuses(OrderItemManager orderItemManager) {
         return orderItemManager.getItems().stream()
