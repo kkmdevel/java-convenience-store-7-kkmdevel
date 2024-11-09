@@ -16,6 +16,22 @@ public class OrderItemTest {
     }
 
     @Test
+    @DisplayName("receivePromotion 메서드 테스트 - 수량 1 증가")
+    void receivePromotionTest() {
+        OrderItem orderItem = OrderItem.of("콜라", 5);
+        orderItem.receivePromotion();
+        assertThat(orderItem.getRequestedQuantity()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("adjustmentQuantity 메서드 테스트 - 수량 조정")
+    void adjustmentQuantityTest() {
+        OrderItem orderItem = OrderItem.of("사이다", 5);
+        orderItem.adjustmentQuantity(2);
+        assertThat(orderItem.getRequestedQuantity()).isEqualTo(3);
+    }
+
+    @Test
     @DisplayName("OrderItem 객체 생성 테스트 - 이름이 null이거나 빈 문자열인 경우 예외 발생")
     void createOrderItem_InvalidName() {
         assertThrows(IllegalArgumentException.class, () -> OrderItem.of(null, 5));
@@ -29,4 +45,6 @@ public class OrderItemTest {
         assertThrows(IllegalArgumentException.class, () -> OrderItem.of("콜라", 0));
         assertThrows(IllegalArgumentException.class, () -> OrderItem.of("콜라", -1));
     }
+
+
 }
