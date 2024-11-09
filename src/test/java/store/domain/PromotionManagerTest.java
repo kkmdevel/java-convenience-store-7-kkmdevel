@@ -1,5 +1,6 @@
 package store.domain;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,17 +29,17 @@ public class PromotionManagerTest {
     @Test
     @DisplayName("첫 번째 프로모션 데이터가 올바른지 검증")
     void testFirstPromotionData() {
-        assertEquals("탄산2+1", firstPromotion.getName());
-        assertEquals(2, firstPromotion.getBuyQuantity());
-        assertEquals(1, firstPromotion.getGetQuantity());
-        assertEquals(LocalDate.of(2024, 1, 1), firstPromotion.getStartDate());
-        assertEquals(LocalDate.of(2024, 12, 31), firstPromotion.getEndDate());
+        assertTrue(firstPromotion.isNameEqualTo("탄산2+1"));
+        assertTrue(firstPromotion.isBuyQuantityEqualTo(2));
+        assertTrue(firstPromotion.isGetQuantityEqualTo(1));
+        assertTrue(firstPromotion.isStartDateEqualTo(LocalDate.of(2024, 1, 1)));
+        assertTrue(firstPromotion.isEndDateEqualTo(LocalDate.of(2024, 12, 31)));
     }
 
     @Test
     @DisplayName("프로모션이 활성 상태인지 검증")
     void testPromotionIsActive() {
-        LocalDate currentDate = LocalDate.of(2024, 6, 15);
+        LocalDate currentDate = LocalDate.from(DateTimes.now());
         assertTrue(firstPromotion.isActive(currentDate));
     }
 }
