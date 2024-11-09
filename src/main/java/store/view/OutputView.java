@@ -11,6 +11,7 @@ public class OutputView {
 
     public static void printWelcomeAndAllProducts(ProductManager productManager) {
         System.out.println(WELCOME.getMessage());
+        System.out.println();
         System.out.println(ALL_PRODUCTS_PREFIX.getMessage());
 
         List<Product> products = productManager.getProducts();
@@ -22,8 +23,8 @@ public class OutputView {
 
     private static String formatProductMessage(Product product) {
         String priceMessage = NumberFormat.getInstance().format(product.getPrice());
-        String quantityMessage = getQuantityMessage(product);
-        String promotionMessage = getPromotionMessage(product);
+        String quantityMessage = formatQuantityMessage(product);
+        String promotionMessage = formatPromotionMessage(product);
         return PRODUCTS.getFormattedMessage(
                 product.getName(),
                 priceMessage,
@@ -31,18 +32,22 @@ public class OutputView {
                 promotionMessage);
     }
 
-    private static String getQuantityMessage(Product product) {
+    private static String formatQuantityMessage(Product product) {
         if(product.getQuantity()==0){
             return "재고 없음";
         }
         return Integer.toString(product.getQuantity());
     }
 
-    private static String getPromotionMessage(Product product) {
+    private static String formatPromotionMessage(Product product) {
         if (product.getPromotion().equals("null")) {
             return "";
         }
         return product.getPromotion();
     }
 
+    public static void printOrderPrefix(){
+        System.out.println();
+        System.out.println(PURCHASE_PREFIX);
+    }
 }
