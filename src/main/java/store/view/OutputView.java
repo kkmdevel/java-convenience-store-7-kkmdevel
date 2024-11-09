@@ -11,8 +11,8 @@ public class OutputView {
 
     public static void printWelcomeAndAllProducts(ProductManager productManager) {
         System.out.println(WELCOME.getMessage());
-        System.out.println();
         System.out.println(ALL_PRODUCTS_PREFIX.getMessage());
+        System.out.println();
 
         List<Product> products = productManager.getProducts();
 
@@ -33,10 +33,10 @@ public class OutputView {
     }
 
     private static String formatQuantityMessage(Product product) {
-        if(product.getQuantity()==0){
+        if(product.availableQuantity()==0){
             return "재고 없음";
         }
-        return Integer.toString(product.getQuantity());
+        return Integer.toString(product.availableQuantity());
     }
 
     private static String formatPromotionMessage(Product product) {
@@ -49,5 +49,15 @@ public class OutputView {
     public static void printOrderPrefix(){
         System.out.println();
         System.out.println(PURCHASE_PREFIX);
+    }
+
+    public static void askForReceivePromotion(String name) {
+        System.out.println();
+        System.out.println(CAN_RECEIVE_BONUS.getFormattedMessage(name));
+    }
+
+    public static void askForAdjustment(String productName, Integer quantity) {
+        System.out.println();
+        System.out.println(ADJUSTMENT_QUANTITY.getFormattedMessage(productName,quantity));
     }
 }
