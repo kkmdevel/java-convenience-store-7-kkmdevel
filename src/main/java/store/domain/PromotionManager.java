@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import store.utils.Parser;
 
-
 public class PromotionManager {
     private static final String PROMOTIONS_FILE_PATH = "src/main/resources/promotions.md";
 
@@ -39,5 +38,19 @@ public class PromotionManager {
 
     public List<Promotion> getPromotions() {
         return promotions;
+    }
+
+    public int calculatePromotionQuantity(String promotionName) {
+        return promotions.stream()
+                .filter(promotion -> promotion.isNameEqualTo(promotionName))
+                .mapToInt(Promotion::calculatePromotionQuantity)
+                .findFirst()
+                .orElse(0);
+    }
+
+    public boolean isPromotionActive(String promotionName, LocalDate now) {
+        return promotions.stream()
+                .filter(promotion -> promotion.isNameEqualTo(promotionName))
+                .anyMatch(promotion -> promotion.isActive(now));
     }
 }
