@@ -35,4 +35,16 @@ public class OrderItem {
         return quantity;
     }
 
+    public boolean hasName(String itemName) {
+        return this.name.equals(itemName);
+    }
+
+    public void receivePromotion(){
+        this.quantity++;
+    }
+
+    public void adjustmentQuantity(int adjustmentQuantity){
+        this.quantity -=adjustmentQuantity;
+    }
+
 }
