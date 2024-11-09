@@ -41,6 +41,12 @@ public final class Parser {
         return orderItems;
     }
 
+    public static boolean parseYesNo(String input) {
+        if (input.equalsIgnoreCase("Y")) return true;
+        if (input.equalsIgnoreCase("N")) return false;
+        throw new IllegalArgumentException();
+    }
+
 
     private static void validateIsEmpty(String input) {
         if (input == null || input.trim().isEmpty()) {
