@@ -1,5 +1,6 @@
 package store.domain;
 
+import java.util.Collections;
 import store.domain.enums.ProductLines;
 import store.utils.DataReader;
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ import store.utils.Parser;
 
 public class ProductManager {
     private static final String PRODUCTS_FILE_PATH = "src/main/resources/products.md";
-
     private final List<Product> products;
 
     private ProductManager(List<Product> products) {
@@ -35,6 +35,39 @@ public class ProductManager {
     }
 
     public List<Product> getProducts() {
-        return products;
+        return Collections.unmodifiableList(products);
+    }
+
+    public int totalQuantityByProductName(String productName) {
+        return products.stream()
+                .filter(product -> product.hasName(productName))
+                .mapToInt(Product::availableQuantity)
+                .sum();
+    }
+
+    public boolean hasProductByName(String productName) {
+        return products.stream().anyMatch(product -> product.hasName(productName));
+    }
+
+    public int calculateTotalPrice(String productName, int requestedQuantity) {
+        return products.stream()
+                .filter(product -> product.hasName(productName))
+                .mapToInt(product -> product.calculatePrice(requestedQuantity))
+                .sum();
+    }
+
+    public String findPromotion(String productName) {
+        return products.stream()
+                .filter(product -> product.hasName(productName) && product.hasPromotion())
+                .map(Product::getPromotion)
+                .findFirst()
+                .orElse("");
+    }
+
+    public int getPromotionStock(String productName) {
+        return products.stream()
+                .filter(product -> product.hasName(productName) && product.hasPromotion())
+                .mapToInt(Product::availableQuantity)
+                .sum();
     }
 }
