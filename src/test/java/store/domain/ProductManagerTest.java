@@ -22,11 +22,10 @@ public class ProductManagerTest {
     void loadProductsFromFile() {
         assertThat(products).isNotEmpty();
         assertAll(
-                () -> assertThat(products.getFirst().getName()).isEqualTo("콜라"),
-                () -> assertThat(products.getFirst().getPrice()).isEqualTo(1000),
-                () -> assertThat(products.getFirst().getQuantity()).isEqualTo(10),
+                () -> assertThat(products.getFirst().hasName("콜라")).isTrue(),
+                () -> assertThat(products.getFirst().calculatePrice(1)).isEqualTo(1000),
+                () -> assertThat(products.getFirst().availableQuantity()).isEqualTo(10),
                 () -> assertThat(products.getFirst().getPromotion()).isEqualTo("탄산2+1")
-                );
+        );
     }
-
 }
