@@ -13,7 +13,7 @@ public class OrderItemManagerTest {
     @DisplayName("OrderItemManager 객체 생성 테스트 - 올바른 입력")
     void createOrderItemManager_ValidInput() {
         Map<String, Integer> orderMap = Map.of("콜라", 5, "사이다", 3);
-        OrderItemManager orderItemManager = OrderItemManager.of(orderMap);
+        OrderItemManager orderItemManager = OrderItemManager.from(orderMap);
 
         List<OrderItem> items = orderItemManager.getItems();
         assertThat(items).hasSize(2);
@@ -27,7 +27,7 @@ public class OrderItemManagerTest {
     @DisplayName("OrderItemManager의 items 리스트가 불변인지 테스트")
     void getItems_ReturnsUnmodifiableList() {
         Map<String, Integer> orderMap = Map.of("콜라", 5);
-        OrderItemManager orderItemManager = OrderItemManager.of(orderMap);
+        OrderItemManager orderItemManager = OrderItemManager.from(orderMap);
 
         List<OrderItem> items = orderItemManager.getItems();
         assertThrows(UnsupportedOperationException.class, () -> items.add(OrderItem.of("사이다", 3)));
