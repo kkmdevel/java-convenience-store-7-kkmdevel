@@ -1,5 +1,6 @@
 package store.service;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,5 +44,18 @@ public class PromotionDiscountServiceTest {
 
         assertThat(regularPrices.get("콜라")).isEqualTo(2);
         assertThat(regularPrices.get("사이다")).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("증정을 받을 수 있는 구매 상품 찾기 테스트")
+    void findCanReceiveBonusTest() {
+        orderItemManager = OrderItemManager.from(Map.of(
+                "콜라", 5,
+                "사이다", 3,
+                "컵라면", 1
+        ));
+        List<OrderItem> canReceiveBonusItems = promotionDiscountService.findCanReceiveBonus(orderItemManager);
+        assertThat(canReceiveBonusItems).hasSize(1);
+        assertThat(canReceiveBonusItems.getFirst().getName()).isEqualTo("콜라");
     }
 }
