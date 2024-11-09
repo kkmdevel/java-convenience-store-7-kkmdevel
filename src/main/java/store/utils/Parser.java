@@ -2,6 +2,10 @@ package store.utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Parser {
 
@@ -25,6 +29,18 @@ public final class Parser {
             throw new IllegalArgumentException();
         }
     }
+
+    public static Map<String, Integer> parseOrderItem(String input) {
+        validateIsEmpty(input);
+        Map<String, Integer> orderItems = new HashMap<>();
+        Arrays.stream(input.split(","))
+                .forEach(product -> {
+                    List<String> parts = List.of(product.trim().replaceAll("[\\[\\]]", "").split("-"));
+                    orderItems.put(parts.get(0).trim(), Parser.parseStringToInt(parts.get(1).trim()));
+                });
+        return orderItems;
+    }
+
 
     private static void validateIsEmpty(String input) {
         if (input == null || input.trim().isEmpty()) {
