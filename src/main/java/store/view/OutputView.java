@@ -1,6 +1,7 @@
 package store.view;
 
 import java.text.NumberFormat;
+import java.util.Map;
 import store.domain.Product;
 import store.domain.ProductManager;
 import static store.view.OutputMessage.*;
@@ -8,6 +9,10 @@ import static store.view.OutputMessage.*;
 import java.util.List;
 
 public class OutputView {
+
+    private static String formatPrice(int price) {
+        return NumberFormat.getInstance().format(price);
+    }
 
     public static void printWelcomeAndAllProducts(ProductManager productManager) {
         System.out.println(WELCOME.getMessage());
@@ -22,7 +27,7 @@ public class OutputView {
     }
 
     private static String formatProductMessage(Product product) {
-        String priceMessage = NumberFormat.getInstance().format(product.getPrice());
+        String priceMessage = formatPrice(product.getPrice());
         String quantityMessage = formatQuantityMessage(product);
         String promotionMessage = formatPromotionMessage(product);
         return PRODUCTS.getFormattedMessage(
@@ -48,7 +53,7 @@ public class OutputView {
 
     public static void printOrderPrefix(){
         System.out.println();
-        System.out.println(PURCHASE_PREFIX);
+        System.out.println(PURCHASE_PREFIX.getMessage());
     }
 
     public static void askForReceivePromotion(String name) {
@@ -59,5 +64,22 @@ public class OutputView {
     public static void askForAdjustment(String productName, Integer quantity) {
         System.out.println();
         System.out.println(ADJUSTMENT_QUANTITY.getFormattedMessage(productName,quantity));
+    }
+
+    public static void printOriginalPrice(Map<String, Integer> purchasedItems, List<Integer> totalPrices) {
+        System.out.println();
+        System.out.println(START_RECEIPT.getMessage());
+        System.out.println(ORIGINAL_PRICE_PREFIX.getMessage());
+        int index = 0;
+        for (String name : purchasedItems.keySet()) {
+            int quantity = purchasedItems.get(name);
+            int totalPrice = totalPrices.get(index++);
+            System.out.println(PURCHASED_ITEMS.getFormattedMessage(name, quantity, formatPrice(totalPrice)));
+        }
+    }
+
+    public static void printBonusItems(Map<String, Integer> bonusMap) {
+        System.out.println(BONUS_ITEMS_PREFIX.getMessage());
+        bonusMap.forEach((name, bonusQuantity) -> System.out.println(BONUS_ITEMS.getFormattedMessage(name,bonusQuantity)));
     }
 }
