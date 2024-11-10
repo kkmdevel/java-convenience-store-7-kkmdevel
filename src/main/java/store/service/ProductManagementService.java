@@ -11,11 +11,17 @@ public class ProductManagementService {
     }
 
     public void updateStock(OrderItemManager orderItemManager) {
-        orderItemManager.getItems().forEach(item -> {
-            int usedPromotionStock = Math.min(productManager.getPromotionStock(item.getName()), item.getRequestedQuantity());
-            productManager.reducePromotionStock(item.getName(), usedPromotionStock);
-            int remainingQuantity = item.getRequestedQuantity() - usedPromotionStock;
-            if (remainingQuantity > 0) productManager.reduceRegularStock(item.getName(), remainingQuantity);
-        });
+        orderItemManager.getItems().forEach(item -> updateItemStock(item.getName(), item.getRequestedQuantity()));
+    }
+
+    private void updateItemStock(String itemName, int requestedQuantity) {
+        int usedPromotionStock = Math.min(productManager.getPromotionStock(itemName), requestedQuantity);
+        productManager.reducePromotionStock(itemName, usedPromotionStock);
+
+        int remainingQuantity = requestedQuantity - usedPromotionStock;
+        if (remainingQuantity > 0) {
+            productManager.reduceRegularStock(itemName, remainingQuantity);
+        }
+
     }
 }
