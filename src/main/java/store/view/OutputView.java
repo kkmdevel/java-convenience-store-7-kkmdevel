@@ -41,7 +41,7 @@ public class OutputView {
         if(product.availableQuantity()==0){
             return "재고 없음";
         }
-        return Integer.toString(product.availableQuantity());
+        return product.availableQuantity() +"개";
     }
 
     private static String formatPromotionMessage(Product product) {
@@ -66,6 +66,11 @@ public class OutputView {
         System.out.println(ADJUSTMENT_QUANTITY.getFormattedMessage(productName,quantity));
     }
 
+    public static void askForMembershipDiscount() {
+        System.out.println();
+        System.out.println(RECEIVE_MEMBERSHIP_DISCOUNT.getMessage());
+    }
+
     public static void printOriginalPrice(Map<String, Integer> purchasedItems, List<Integer> totalPrices) {
         System.out.println();
         System.out.println(START_RECEIPT.getMessage());
@@ -82,4 +87,22 @@ public class OutputView {
         System.out.println(BONUS_ITEMS_PREFIX.getMessage());
         bonusMap.forEach((name, bonusQuantity) -> System.out.println(BONUS_ITEMS.getFormattedMessage(name,bonusQuantity)));
     }
+
+    public static void printTotalPrice(int totalItemQuantity, int totalPriceSum) {
+        System.out.println(CALCULATION_DISCOUNT_PREFIX.getMessage());
+        System.out.println(TOTAL_PRICE.getFormattedMessage(totalItemQuantity,formatPrice(totalPriceSum)));
+    }
+
+    public static void printPromotionDiscountPrices(int totalPromotionDiscountAmount) {
+        System.out.println(PROMOTION_DISCOUNT.getFormattedMessage(formatPrice(totalPromotionDiscountAmount)));
+    }
+
+    public static void printMembershipDiscount(int membershipDiscountAmount) {
+        System.out.println(MEMBERSHIP_DISCOUNT.getFormattedMessage(formatPrice(membershipDiscountAmount)));
+    }
+
+    public static void printPayableAmount(int payableAmount) {
+        System.out.println(PAYABLE_AMOUNT.getFormattedMessage(formatPrice(payableAmount)));
+    }
+
 }
