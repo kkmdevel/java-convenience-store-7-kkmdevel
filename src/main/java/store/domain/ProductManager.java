@@ -38,18 +38,7 @@ public class ProductManager {
         return Collections.unmodifiableList(products);
     }
 
-    public int totalQuantityByProductName(String productName) {
-        return products.stream()
-                .filter(product -> product.hasName(productName))
-                .mapToInt(Product::availableQuantity)
-                .sum();
-    }
-
-    public boolean hasProductByName(String productName) {
-        return products.stream().anyMatch(product -> product.hasName(productName));
-    }
-
-    public int calculateTotalPrice(String productName, int requestedQuantity) {
+    public int calculatePrice(String productName, int requestedQuantity) {
         return products.stream()
                 .filter(product -> product.hasName(productName))
                 .findFirst()
@@ -71,4 +60,27 @@ public class ProductManager {
                 .mapToInt(Product::availableQuantity)
                 .sum();
     }
+
+    public int getRegularStock(String productName) {
+        return products.stream()
+                .filter(product -> product.hasName(productName) && !product.hasPromotion())
+                .mapToInt(Product::availableQuantity)
+                .sum();
+    }
+
+
+    public void reducePromotionStock(String productName, int usedPromotionStock) {
+        products.stream()
+                .filter(product -> product.hasName(productName) && product.hasPromotion())
+                .findFirst()
+                .ifPresent(product -> product.reduceStock(usedPromotionStock));
+    }
+
+    public void reduceRegularStock(String productName, int usedRegularStock) {
+        products.stream()
+                .filter(product -> product.hasName(productName) && !product.hasPromotion())
+                .findFirst()
+                .ifPresent(product -> product.reduceStock(usedRegularStock));
+    }
+
 }
