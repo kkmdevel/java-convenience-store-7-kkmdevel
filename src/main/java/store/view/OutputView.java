@@ -109,4 +109,9 @@ public class OutputView {
         System.out.println();
         System.out.println(CONTINUE_SHOPPING.getMessage());
     }
+
+    public static void printErrorMessage(String ErrorMessage){
+        System.out.println();
+        System.out.println(ErrorMessage);
+    }
 }
