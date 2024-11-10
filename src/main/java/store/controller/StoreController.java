@@ -5,7 +5,7 @@ import store.domain.PromotionManager;
 import store.domain.PromotionResult;
 import store.domain.ProductManager;
 import store.service.PromotionDiscountService;
-import store.service.PriceCalculationService;
+import store.service.TotalPriceCalculator;
 import store.service.MembershipDiscountService;
 import store.view.OutputView;
 
@@ -14,15 +14,14 @@ public class StoreController {
     private final OrderController orderController;
     private final PromotionController promotionController;
     private final DiscountAndPaymentController discountAndPaymentController;
-    private final PriceCalculationService priceCalculationService;
 
     public StoreController() {
         ProductManager productManager = ProductManager.load();
         PromotionManager promotionManager = PromotionManager.load();
 
-        this.priceCalculationService = new PriceCalculationService(productManager);
+        TotalPriceCalculator totalPriceCalculator = new TotalPriceCalculator(productManager);
         this.productController = new ProductController(productManager);
-        this.orderController = new OrderController(priceCalculationService);
+        this.orderController = new OrderController(totalPriceCalculator);
         this.promotionController = new PromotionController(new PromotionDiscountService(productManager, promotionManager));
         this.discountAndPaymentController = new DiscountAndPaymentController(new MembershipDiscountService(productManager));
     }
@@ -60,7 +59,7 @@ public class StoreController {
         displayBonus(promotionResult);
 
         int totalPrice = orderController.displayTotalPrice(orderItemManager, orderController.getTotalPrices(orderItemManager));
-        int promotionDiscountAmount = priceCalculationService.calculatePromotionDiscount(promotionResult.getBonusMap());
+        int promotionDiscountAmount = promotionController.calculatePromotionDiscount(promotionResult.getBonusMap());
         OutputView.printPromotionDiscountPrices(promotionDiscountAmount);
         displayMembershipDiscount(membershipDiscountAmount);
 

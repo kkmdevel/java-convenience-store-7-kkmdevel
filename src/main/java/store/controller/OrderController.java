@@ -5,16 +5,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import store.domain.OrderItemManager;
 import store.domain.OrderItem;
-import store.service.PriceCalculationService;
+import store.service.TotalPriceCalculator;
 import store.utils.Parser;
 import store.view.InputView;
 import store.view.OutputView;
 
 public class OrderController {
-    private final PriceCalculationService priceCalculationService;
+    private final TotalPriceCalculator totalPriceCalculator;
 
-    public OrderController(PriceCalculationService priceCalculationService) {
-        this.priceCalculationService = priceCalculationService;
+    public OrderController(TotalPriceCalculator totalPriceCalculator) {
+        this.totalPriceCalculator = totalPriceCalculator;
     }
 
     public OrderItemManager getOrderItemsFromUser() {
@@ -35,7 +35,7 @@ public class OrderController {
     }
 
     public List<Integer> getTotalPrices(OrderItemManager orderItemManager) {
-        return priceCalculationService.calculateTotalPrice(orderItemManager);
+        return totalPriceCalculator.calculateTotalPrice(orderItemManager);
     }
 
     public int displayTotalPrice(OrderItemManager orderItemManager, List<Integer> totalPrices) {
