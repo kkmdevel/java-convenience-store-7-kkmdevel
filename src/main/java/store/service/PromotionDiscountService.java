@@ -26,6 +26,7 @@ public class PromotionDiscountService {
                 .filter(item -> {
                     String promotion = productManager.findPromotion(item.getName());
                     return !promotion.isEmpty() &&
+                            isBonusApplicable(item) &&
                             item.getRequestedQuantity() % getPromotionQuantity(item) == getPromotionQuantity(item) - 1 &&
                             item.getRequestedQuantity() + 1 <= productManager.getPromotionStock(item.getName());
                 })
