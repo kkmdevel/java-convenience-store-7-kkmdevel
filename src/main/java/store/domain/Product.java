@@ -44,4 +44,9 @@ public class Product {
     public int calculatePrice(int requestedQuantity) {
         return price * requestedQuantity;
     }
+
+    public void reduceStock(int usedStock) {
+            this.quantity -= usedStock;
+    }
+
 }
