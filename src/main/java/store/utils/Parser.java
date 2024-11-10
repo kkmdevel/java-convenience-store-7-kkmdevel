@@ -3,7 +3,7 @@ package store.utils;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public final class Parser {
 
     public static Map<String, Integer> parseOrderItem(String input) {
         validateIsEmpty(input);
-        Map<String, Integer> orderItems = new HashMap<>();
+        Map<String, Integer> orderItems = new LinkedHashMap<>();
 
         Arrays.asList(input.split(",")).forEach(product -> {
             List<String> parts = parseAndValidateProduct(product);
