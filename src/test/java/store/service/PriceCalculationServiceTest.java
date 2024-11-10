@@ -34,4 +34,17 @@ public class PriceCalculationServiceTest {
         assertThat(totalPrices.get(0)).isEqualTo(1000 * 5);
         assertThat(totalPrices.get(1)).isEqualTo(1000 * 3);
     }
+
+    @Test
+    @DisplayName("프로모션 할인 계산 테스트")
+    void calculatePromotionDiscountTest() {
+        Map<String, Integer> bonuses = Map.of(
+                "콜라", 3,
+                "사이다", 2
+        );
+
+        int promotionDiscountAmount = priceCalculationService.calculatePromotionDiscount(bonuses);
+
+        assertThat(promotionDiscountAmount).isEqualTo((1000 * 3) + (1000 * 2));
+    }
 }
