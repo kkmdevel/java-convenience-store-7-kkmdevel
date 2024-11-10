@@ -9,6 +9,7 @@ import store.domain.ProductManager;
 import store.domain.PromotionManager;
 import store.domain.PromotionResult;
 import store.service.MembershipDiscountService;
+import store.service.ProductManagementService;
 import store.service.PromotionDiscountService;
 import store.service.PriceCalculationService;
 import store.utils.Parser;
@@ -21,6 +22,7 @@ public class StoreController {
     private final PromotionDiscountService promotionDiscountService;
     private final PriceCalculationService priceCalculationService;
     private final MembershipDiscountService membershipDiscountService;
+    private final ProductManagementService productManagementService;
 
     public StoreController() {
         this.productManager = ProductManager.load();
@@ -28,6 +30,7 @@ public class StoreController {
         this.promotionDiscountService = new PromotionDiscountService(productManager, promotionManager);
         this.priceCalculationService = new PriceCalculationService(productManager);
         this.membershipDiscountService = new MembershipDiscountService(productManager);
+        this.productManagementService = new ProductManagementService(productManager);
     }
 
     public void start() {
@@ -37,12 +40,13 @@ public class StoreController {
         updateOrderItemsIndividually(orderItemManager, promotionResult);
         List<Integer> totalPrices = getTotalPrices(orderItemManager);
         int membershipDiscountAmount = askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
-        displayTotalAmount(orderItemManager,totalPrices);
+        displayTotalAmount(orderItemManager, totalPrices);
         displayBonus(promotionResult);
-        int totalPrice = displayTotalPrice(orderItemManager,totalPrices);
+        int totalPrice = displayTotalPrice(orderItemManager, totalPrices);
         int promotionDiscountAmount = calculateAndDisplayPromotionDiscount(promotionResult);
         OutputView.printMembershipDiscount(membershipDiscountAmount);
-        displayPayableAmount(totalPrice,membershipDiscountAmount+promotionDiscountAmount);
+        displayPayableAmount(totalPrice, membershipDiscountAmount + promotionDiscountAmount);
+        manageStock(orderItemManager);
     }
 
     private void displayProducts() {
@@ -75,7 +79,7 @@ public class StoreController {
 
     private void updateOrderItemsIndividually(OrderItemManager orderItemManager, PromotionResult promotionResult) {
         promotionResult.getRegularPriceMap().forEach((productName, quantity) -> {
-            if(quantity>0) {
+            if (quantity > 0) {
                 OutputView.askForAdjustment(productName, quantity);
                 if (!Parser.parseYesNo(InputView.readLine())) {
                     orderItemManager.updateOrderItemAdjustment(productName, quantity);
@@ -83,7 +87,6 @@ public class StoreController {
             }
         });
     }
-
 
     private int askAndCalculateMembershipDiscount(OrderItemManager orderItemManager, PromotionResult promotionResult) {
         OutputView.askForMembershipDiscount();
@@ -93,8 +96,7 @@ public class StoreController {
         return 0;
     }
 
-
-    private void displayTotalAmount(OrderItemManager orderItemManager,List<Integer> totalPrices) {
+    private void displayTotalAmount(OrderItemManager orderItemManager, List<Integer> totalPrices) {
         Map<String, Integer> purchasedItems = orderItemManager.getItems().stream()
                 .collect(Collectors.toMap(
                         OrderItem::getName,
@@ -125,14 +127,17 @@ public class StoreController {
     }
 
     private int calculateAndDisplayPromotionDiscount(PromotionResult promotionResult) {
-        int PromotionDiscountAmount = priceCalculationService.calculatePromotionDiscount(promotionResult.getBonusMap());
-        OutputView.printPromotionDiscountPrices(PromotionDiscountAmount);
-        return PromotionDiscountAmount;
+        int promotionDiscountAmount = priceCalculationService.calculatePromotionDiscount(promotionResult.getBonusMap());
+        OutputView.printPromotionDiscountPrices(promotionDiscountAmount);
+        return promotionDiscountAmount;
     }
 
     private void displayPayableAmount(int totalPrice, int discountAmount) {
         OutputView.printPayableAmount(totalPrice - discountAmount);
     }
 
+    private void manageStock(OrderItemManager orderItemManager) {
+        productManagementService.updateStock(orderItemManager);
+    }
 
 }
