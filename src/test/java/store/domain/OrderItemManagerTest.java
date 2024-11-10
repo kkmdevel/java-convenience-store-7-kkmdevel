@@ -1,5 +1,6 @@
 package store.domain;
 
+import java.util.LinkedHashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -14,7 +15,10 @@ public class OrderItemManagerTest {
     @Test
     @DisplayName("OrderItemManager 객체 생성 테스트 - 올바른 입력")
     void createOrderItemManager_ValidInput() {
-        Map<String, Integer> orderMap = Map.of("콜라", 5, "사이다", 3);
+        Map<String, Integer> orderMap = new LinkedHashMap<>();
+        orderMap.put("콜라", 5);
+        orderMap.put("사이다", 3);
+
         OrderItemManager orderItemManager = OrderItemManager.from(orderMap, productManager);
 
         List<OrderItem> items = orderItemManager.getItems();

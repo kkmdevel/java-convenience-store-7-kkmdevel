@@ -1,12 +1,13 @@
 package store.service;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import store.domain.*;
-
-import java.util.List;
-import java.util.Map;
+import store.domain.OrderItemManager;
+import store.domain.ProductManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,10 +21,11 @@ public class TotalPriceCalculatorTest {
         ProductManager productManager = ProductManager.load();
         totalPriceCalculator = new TotalPriceCalculator(productManager);
 
-        orderItemManager = OrderItemManager.from(Map.of(
-                "콜라", 5,
-                "사이다", 3
-        ),productManager);
+        Map<String, Integer> orderMap = new LinkedHashMap<>();
+        orderMap.put("콜라", 5);
+        orderMap.put("사이다", 3);
+
+        orderItemManager = OrderItemManager.from(orderMap, productManager);
     }
 
     @Test
