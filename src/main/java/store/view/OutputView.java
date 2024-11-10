@@ -105,4 +105,8 @@ public class OutputView {
         System.out.println(PAYABLE_AMOUNT.getFormattedMessage(formatPrice(payableAmount)));
     }
 
+    public static void askToContinueShopping() {
+        System.out.println();
+        System.out.println(CONTINUE_SHOPPING.getMessage());
+    }
 }
