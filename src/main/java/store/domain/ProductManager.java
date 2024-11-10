@@ -38,6 +38,17 @@ public class ProductManager {
         return Collections.unmodifiableList(products);
     }
 
+    public int calculateTotalStockForProduct(String productName) {
+        return products.stream()
+                .filter(product -> product.hasName(productName))
+                .mapToInt(Product::availableQuantity)
+                .sum();
+    }
+
+    public boolean isProductAvailable(String productName) {
+        return products.stream().anyMatch(product -> product.hasName(productName));
+    }
+
     public int calculatePrice(String productName, int requestedQuantity) {
         return products.stream()
                 .filter(product -> product.hasName(productName))
