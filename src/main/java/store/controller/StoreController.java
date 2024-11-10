@@ -86,8 +86,13 @@ public class StoreController {
     }
 
     private void displayBonus(PromotionResult promotionResult) {
-        OutputView.printBonusItems(promotionResult.getBonusMap());
+        Map<String, Integer> filteredBonusMap = promotionResult.getBonusMap().entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        OutputView.printBonusItems(filteredBonusMap);
     }
+
 
 
 }
