@@ -1,151 +1,89 @@
 package store.controller;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import store.domain.OrderItem;
 import store.domain.OrderItemManager;
-import store.domain.ProductManager;
 import store.domain.PromotionManager;
 import store.domain.PromotionResult;
-import store.service.MembershipDiscountService;
-import store.service.ProductManagementService;
+import store.domain.ProductManager;
 import store.service.PromotionDiscountService;
 import store.service.PriceCalculationService;
-import store.utils.Parser;
-import store.view.InputView;
+import store.service.MembershipDiscountService;
 import store.view.OutputView;
 
 public class StoreController {
-    private final ProductManager productManager;
-    private final PromotionManager promotionManager;
-    private final PromotionDiscountService promotionDiscountService;
+    private final ProductController productController;
+    private final OrderController orderController;
+    private final PromotionController promotionController;
+    private final DiscountAndPaymentController discountAndPaymentController;
     private final PriceCalculationService priceCalculationService;
-    private final MembershipDiscountService membershipDiscountService;
-    private final ProductManagementService productManagementService;
 
     public StoreController() {
-        this.productManager = ProductManager.load();
-        this.promotionManager = PromotionManager.load();
-        this.promotionDiscountService = new PromotionDiscountService(productManager, promotionManager);
+        ProductManager productManager = ProductManager.load();
+        PromotionManager promotionManager = PromotionManager.load();
+
         this.priceCalculationService = new PriceCalculationService(productManager);
-        this.membershipDiscountService = new MembershipDiscountService(productManager);
-        this.productManagementService = new ProductManagementService(productManager);
+        this.productController = new ProductController(productManager);
+        this.orderController = new OrderController(priceCalculationService);
+        this.promotionController = new PromotionController(new PromotionDiscountService(productManager, promotionManager));
+        this.discountAndPaymentController = new DiscountAndPaymentController(new MembershipDiscountService(productManager));
     }
 
     public void start() {
-        boolean continueShopping;
         do {
-            displayProducts();
-            OrderItemManager orderItemManager = getOrderItemsFromUser();
-            PromotionResult promotionResult = applyPromotions(orderItemManager);
-            updateOrderItemsIndividually(orderItemManager, promotionResult);
-            List<Integer> totalPrices = getTotalPrices(orderItemManager);
-            int membershipDiscountAmount = askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
-            displayTotalAmount(orderItemManager, totalPrices);
-            displayBonus(promotionResult);
-            int totalPrice = displayTotalPrice(orderItemManager, totalPrices);
-            int promotionDiscountAmount = calculateAndDisplayPromotionDiscount(promotionResult);
-            OutputView.printMembershipDiscount(membershipDiscountAmount);
-            displayPayableAmount(totalPrice, membershipDiscountAmount + promotionDiscountAmount);
-            manageStock(orderItemManager);
-            continueShopping = askToContinueShopping();
-        } while (continueShopping);
+            executeShoppingCycle();
+        } while (discountAndPaymentController.askToContinueShopping());
     }
 
-    private void displayProducts() {
-        OutputView.printWelcomeAndAllProducts(productManager);
+    private void executeShoppingCycle() {
+        productController.displayProducts();
+        OrderItemManager orderItemManager = getOrderItemsFromUser();
+        PromotionResult promotionResult = applyPromotions(orderItemManager);
+        processOrderAndCalculateDiscounts(orderItemManager, promotionResult);
+        productController.manageStock(orderItemManager);
     }
 
     private OrderItemManager getOrderItemsFromUser() {
-        OutputView.printOrderPrefix();
-        String input = InputView.readLine();
-        Map<String, Integer> orderMap = Parser.parseOrderItem(input);
-        return OrderItemManager.from(orderMap);
+        return orderController.getOrderItemsFromUser();
     }
 
     private PromotionResult applyPromotions(OrderItemManager orderItemManager) {
-        checkAndReceivePromotionItems(orderItemManager);
-        Map<String, Integer> bonuses = promotionDiscountService.calculateBonuses(orderItemManager);
-        Map<String, Integer> regularPrices = promotionDiscountService.calculateRegularPrices(orderItemManager, bonuses);
-        return PromotionResult.of(bonuses, regularPrices);
+        return promotionController.applyPromotions(orderItemManager);
     }
 
-    private void checkAndReceivePromotionItems(OrderItemManager orderItemManager) {
-        List<OrderItem> canReceivePromotion = promotionDiscountService.findCanReceiveBonus(orderItemManager);
-        for (OrderItem item : canReceivePromotion) {
-            OutputView.askForReceivePromotion(item.getName());
-            if (Parser.parseYesNo(InputView.readLine())) {
-                orderItemManager.updateOrderItemPlusPromotion(item.getName());
-            }
-        }
+    private void processOrderAndCalculateDiscounts(OrderItemManager orderItemManager, PromotionResult promotionResult) {
+        applyPromotionsAndAdjustments(orderItemManager, promotionResult);
+        int membershipDiscountAmount = askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
+        displayOrderDetails(orderItemManager);
+        displayDiscountsAndPayableAmount(orderItemManager, promotionResult, membershipDiscountAmount);
     }
 
-    private void updateOrderItemsIndividually(OrderItemManager orderItemManager, PromotionResult promotionResult) {
-        promotionResult.getRegularPriceMap().forEach((productName, quantity) -> {
-            if (quantity > 0) {
-                OutputView.askForAdjustment(productName, quantity);
-                if (!Parser.parseYesNo(InputView.readLine())) {
-                    orderItemManager.updateOrderItemAdjustment(productName, quantity);
-                }
-            }
-        });
+    private void displayDiscountsAndPayableAmount(OrderItemManager orderItemManager, PromotionResult promotionResult, int membershipDiscountAmount) {
+        displayBonus(promotionResult);
+
+        int totalPrice = orderController.displayTotalPrice(orderItemManager, orderController.getTotalPrices(orderItemManager));
+        int promotionDiscountAmount = priceCalculationService.calculatePromotionDiscount(promotionResult.getBonusMap());
+        OutputView.printPromotionDiscountPrices(promotionDiscountAmount);
+        displayMembershipDiscount(membershipDiscountAmount);
+
+        discountAndPaymentController.displayPayableAmount(totalPrice, membershipDiscountAmount + promotionDiscountAmount);
     }
 
     private int askAndCalculateMembershipDiscount(OrderItemManager orderItemManager, PromotionResult promotionResult) {
-        OutputView.askForMembershipDiscount();
-        if (Parser.parseYesNo(InputView.readLine())) {
-            return membershipDiscountService.calculateMembershipDiscount(orderItemManager, promotionResult.getBonusMap());
-        }
-        return 0;
+        return discountAndPaymentController.askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
     }
 
-    private void displayTotalAmount(OrderItemManager orderItemManager, List<Integer> totalPrices) {
-        Map<String, Integer> purchasedItems = orderItemManager.getItems().stream()
-                .collect(Collectors.toMap(
-                        OrderItem::getName,
-                        OrderItem::getRequestedQuantity
-                ));
-        OutputView.printOriginalPrice(purchasedItems, totalPrices);
+    private void displayMembershipDiscount(int membershipDiscountAmount) {
+        OutputView.printMembershipDiscount(membershipDiscountAmount);
     }
 
-    private List<Integer> getTotalPrices(OrderItemManager orderItemManager) {
-        return priceCalculationService.calculateTotalPrice(orderItemManager);
+    private void displayOrderDetails(OrderItemManager orderItemManager) {
+        orderController.displayTotalAmount(orderItemManager, orderController.getTotalPrices(orderItemManager));
+    }
+
+    private void applyPromotionsAndAdjustments(OrderItemManager orderItemManager, PromotionResult promotionResult) {
+        promotionController.updateOrderItemsIndividually(orderItemManager, promotionResult);
     }
 
     private void displayBonus(PromotionResult promotionResult) {
-        Map<String, Integer> filteredBonusMap = promotionResult.getBonusMap().entrySet().stream()
-                .filter(entry -> entry.getValue() > 0)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        OutputView.printBonusItems(filteredBonusMap);
-    }
-
-    private int displayTotalPrice(OrderItemManager orderItemManager, List<Integer> totalPrices) {
-        int totalItemQuantity = orderItemManager.getItems().stream()
-                .mapToInt(OrderItem::getRequestedQuantity)
-                .sum();
-        int totalPriceSum = totalPrices.stream().mapToInt(Integer::intValue).sum();
-        OutputView.printTotalPrice(totalItemQuantity, totalPriceSum);
-        return totalPriceSum;
-    }
-
-    private int calculateAndDisplayPromotionDiscount(PromotionResult promotionResult) {
-        int promotionDiscountAmount = priceCalculationService.calculatePromotionDiscount(promotionResult.getBonusMap());
-        OutputView.printPromotionDiscountPrices(promotionDiscountAmount);
-        return promotionDiscountAmount;
-    }
-
-    private void displayPayableAmount(int totalPrice, int discountAmount) {
-        OutputView.printPayableAmount(totalPrice - discountAmount);
-    }
-
-    private void manageStock(OrderItemManager orderItemManager) {
-        productManagementService.updateStock(orderItemManager);
-    }
-
-    private boolean askToContinueShopping() {
-        OutputView.askToContinueShopping();
-        return Parser.parseYesNo(InputView.readLine());
+        promotionController.displayBonus(promotionResult);
     }
 }
