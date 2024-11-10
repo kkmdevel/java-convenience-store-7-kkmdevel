@@ -15,11 +15,17 @@ public class DiscountAndPaymentController {
     }
 
     public int askAndCalculateMembershipDiscount(OrderItemManager orderItemManager, PromotionResult promotionResult) {
-        OutputView.askForMembershipDiscount();
-        if (Parser.parseYesNo(InputView.readLine())) {
-            return membershipDiscountService.calculateMembershipDiscount(orderItemManager, promotionResult.getBonusMap());
+        while (true) {
+            try {
+                OutputView.askForMembershipDiscount();
+                if (Parser.parseYesNo(InputView.readLine())) {
+                    return membershipDiscountService.calculateMembershipDiscount(orderItemManager, promotionResult.getBonusMap());
+                }
+                return 0;
+            } catch (IllegalArgumentException e) {
+                OutputView.printErrorMessage(e.getMessage());
+            }
         }
-        return 0;
     }
 
     public void displayPayableAmount(int totalPrice, int discountAmount) {
@@ -27,7 +33,13 @@ public class DiscountAndPaymentController {
     }
 
     public boolean askToContinueShopping() {
-        OutputView.askToContinueShopping();
-        return Parser.parseYesNo(InputView.readLine());
+        while (true) {
+            try {
+                OutputView.askToContinueShopping();
+                return Parser.parseYesNo(InputView.readLine());
+            } catch (IllegalArgumentException e) {
+                OutputView.printErrorMessage(e.getMessage());
+            }
+        }
     }
 }
