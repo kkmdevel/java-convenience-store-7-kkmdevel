@@ -18,6 +18,10 @@ public class PromotionController {
         this.promotionDiscountService = promotionDiscountService;
     }
 
+    public int calculatePromotionDiscount(Map<String, Integer> bonusMap) {
+        return promotionDiscountService.calculatePromotionDiscount(bonusMap);
+    }
+
     public PromotionResult applyPromotions(OrderItemManager orderItemManager) {
         checkAndReceivePromotionItems(orderItemManager);
         Map<String, Integer> bonuses = promotionDiscountService.calculateBonuses(orderItemManager);
