@@ -34,19 +34,23 @@ public class StoreController {
     }
 
     public void start() {
-        displayProducts();
-        OrderItemManager orderItemManager = getOrderItemsFromUser();
-        PromotionResult promotionResult = applyPromotions(orderItemManager);
-        updateOrderItemsIndividually(orderItemManager, promotionResult);
-        List<Integer> totalPrices = getTotalPrices(orderItemManager);
-        int membershipDiscountAmount = askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
-        displayTotalAmount(orderItemManager, totalPrices);
-        displayBonus(promotionResult);
-        int totalPrice = displayTotalPrice(orderItemManager, totalPrices);
-        int promotionDiscountAmount = calculateAndDisplayPromotionDiscount(promotionResult);
-        OutputView.printMembershipDiscount(membershipDiscountAmount);
-        displayPayableAmount(totalPrice, membershipDiscountAmount + promotionDiscountAmount);
-        manageStock(orderItemManager);
+        boolean continueShopping;
+        do {
+            displayProducts();
+            OrderItemManager orderItemManager = getOrderItemsFromUser();
+            PromotionResult promotionResult = applyPromotions(orderItemManager);
+            updateOrderItemsIndividually(orderItemManager, promotionResult);
+            List<Integer> totalPrices = getTotalPrices(orderItemManager);
+            int membershipDiscountAmount = askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
+            displayTotalAmount(orderItemManager, totalPrices);
+            displayBonus(promotionResult);
+            int totalPrice = displayTotalPrice(orderItemManager, totalPrices);
+            int promotionDiscountAmount = calculateAndDisplayPromotionDiscount(promotionResult);
+            OutputView.printMembershipDiscount(membershipDiscountAmount);
+            displayPayableAmount(totalPrice, membershipDiscountAmount + promotionDiscountAmount);
+            manageStock(orderItemManager);
+            continueShopping = askToContinueShopping();
+        } while (continueShopping);
     }
 
     private void displayProducts() {
@@ -140,4 +144,8 @@ public class StoreController {
         productManagementService.updateStock(orderItemManager);
     }
 
+    private boolean askToContinueShopping() {
+        OutputView.askToContinueShopping();
+        return Parser.parseYesNo(InputView.readLine());
+    }
 }
