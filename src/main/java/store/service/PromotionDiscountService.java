@@ -24,14 +24,13 @@ public class PromotionDiscountService {
     public List<OrderItem> findCanReceiveBonus(OrderItemManager orderItemManager) {
         return orderItemManager.getItems().stream()
                 .filter(item -> {
-                    int promotionQuantity = getPromotionQuantity(item);
-                    int promotionStock = productManager.getPromotionStock(item.getName());
-                    return item.getRequestedQuantity() % promotionQuantity == promotionQuantity - 1
-                            && item.getRequestedQuantity() + 1 <= promotionStock;
+                    String promotion = productManager.findPromotion(item.getName());
+                    return !promotion.isEmpty() &&
+                            item.getRequestedQuantity() % getPromotionQuantity(item) == getPromotionQuantity(item) - 1 &&
+                            item.getRequestedQuantity() + 1 <= productManager.getPromotionStock(item.getName());
                 })
                 .toList();
     }
-
 
     public Map<String, Integer> calculateBonuses(OrderItemManager orderItemManager) {
         return orderItemManager.getItems().stream()
@@ -43,18 +42,23 @@ public class PromotionDiscountService {
     }
 
     public Map<String, Integer> calculateRegularPrices(OrderItemManager orderItemManager, Map<String, Integer> bonuses) {
-        return orderItemManager.getItems().stream().collect(Collectors.toMap(
-                OrderItem::getName,
-                item -> {
-                    int promotionStock = productManager.getPromotionStock(item.getName());
-                    int totalPromotionQuantity = calculateTotalPromotionQuantity(bonuses.get(item.getName()), item);
-                    int requestedQuantity = item.getRequestedQuantity();
-                    if (promotionStock >= requestedQuantity) {
-                        return 0;
-                    }
-                    return requestedQuantity - totalPromotionQuantity;
-                }
-        ));
+        return orderItemManager.getItems().stream()
+                .collect(Collectors.toMap(
+                        OrderItem::getName,
+                        item -> calculateRegularPriceForItem(item, bonuses)
+                ));
+    }
+
+    private int calculateRegularPriceForItem(OrderItem item, Map<String, Integer> bonuses) {
+        int promotionStock = productManager.getPromotionStock(item.getName());
+        int bonusQuantity = bonuses.getOrDefault(item.getName(), 0);
+        int totalPromotionQuantity = calculateTotalPromotionQuantity(bonusQuantity, item);
+        int requestedQuantity = item.getRequestedQuantity();
+
+        if (promotionStock >= requestedQuantity || bonusQuantity == 0) {
+            return 0;
+        }
+        return requestedQuantity - totalPromotionQuantity;
     }
 
     private boolean isBonusApplicable(OrderItem item) {
