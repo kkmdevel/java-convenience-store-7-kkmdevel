@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import store.domain.OrderItemManager;
 import store.domain.OrderItem;
+import store.domain.ProductManager;
 import store.service.TotalPriceCalculator;
 import store.utils.Parser;
 import store.view.InputView;
@@ -12,18 +13,25 @@ import store.view.OutputView;
 
 public class OrderController {
     private final TotalPriceCalculator totalPriceCalculator;
+    private final ProductManager productManager;
 
-    public OrderController(TotalPriceCalculator totalPriceCalculator) {
+    public OrderController(TotalPriceCalculator totalPriceCalculator, ProductManager productManager) {
         this.totalPriceCalculator = totalPriceCalculator;
+        this.productManager = productManager;
     }
 
     public OrderItemManager getOrderItemsFromUser() {
-        OutputView.printOrderPrefix();
-        String input = InputView.readLine();
-        Map<String, Integer> orderMap = Parser.parseOrderItem(input);
-        return OrderItemManager.from(orderMap);
+        while (true) {
+            try {
+                OutputView.printOrderPrefix();
+                String input = InputView.readLine();
+                Map<String, Integer> orderMap = Parser.parseOrderItem(input);
+                return OrderItemManager.from(orderMap, productManager);
+            } catch (IllegalArgumentException e) {
+                OutputView.printErrorMessage(e.getMessage());
+            }
+        }
     }
-
 
     public void displayTotalAmount(OrderItemManager orderItemManager, List<Integer> totalPrices) {
         Map<String, Integer> purchasedItems = orderItemManager.getItems().stream()

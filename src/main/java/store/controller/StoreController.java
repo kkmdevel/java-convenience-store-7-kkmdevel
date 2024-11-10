@@ -21,7 +21,7 @@ public class StoreController {
 
         TotalPriceCalculator totalPriceCalculator = new TotalPriceCalculator(productManager);
         this.productController = new ProductController(productManager);
-        this.orderController = new OrderController(totalPriceCalculator);
+        this.orderController = new OrderController(totalPriceCalculator,productManager);
         this.promotionController = new PromotionController(new PromotionDiscountService(productManager, promotionManager));
         this.discountAndPaymentController = new DiscountAndPaymentController(new MembershipDiscountService(productManager));
     }
