@@ -50,4 +50,19 @@ public class OrderItemManagerTest {
         orderItemManager.updateOrderItemAdjustment("사이다", 2);
         assertThat(orderItemManager.getItems().getFirst().getRequestedQuantity()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("존재하지 않는 상품을 주문할 경우 예외 발생 테스트")
+    void createOrderItemManager_InvalidProductName() {
+        Map<String, Integer> orderMap = Map.of("없는상품", 5);
+        assertThrows(IllegalArgumentException.class, () -> OrderItemManager.from(orderMap, productManager));
+    }
+
+    @Test
+    @DisplayName("재고 수량을 초과하는 주문 요청 시 예외 발생 테스트")
+    void createOrderItemManager_ExceedsStock() {
+        Map<String, Integer> orderMap = Map.of("콜라", 1000);
+        assertThrows(IllegalArgumentException.class, () -> OrderItemManager.from(orderMap, productManager));
+    }
+
 }
