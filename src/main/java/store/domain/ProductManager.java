@@ -52,8 +52,9 @@ public class ProductManager {
     public int calculateTotalPrice(String productName, int requestedQuantity) {
         return products.stream()
                 .filter(product -> product.hasName(productName))
-                .mapToInt(product -> product.calculatePrice(requestedQuantity))
-                .sum();
+                .findFirst()
+                .map(product -> product.calculatePrice(requestedQuantity))
+                .orElse(0);
     }
 
     public String findPromotion(String productName) {
