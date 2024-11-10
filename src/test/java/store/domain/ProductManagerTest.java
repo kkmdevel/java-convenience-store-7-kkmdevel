@@ -66,4 +66,25 @@ public class ProductManagerTest {
         assertThat(productManager.getPromotionStock("콜라")).isEqualTo(initialPromotionStock - 3);
         assertThat(productManager.getRegularStock("콜라")).isEqualTo(initialRegularStock - 2);
     }
+
+    @Test
+    @DisplayName("특정 상품이 존재하는지 확인한다.")
+    void isProductAvailable() {
+        boolean isAvailable = productManager.isProductAvailable("콜라");
+        boolean isNotAvailable = productManager.isProductAvailable("없는상품");
+
+        assertThat(isAvailable).isTrue();
+        assertThat(isNotAvailable).isFalse();
+    }
+
+    @Test
+    @DisplayName("특정 상품의 총 재고 수량을 정확히 계산한다.")
+    void calculateTotalStockForProduct() {
+        int totalStock = productManager.calculateTotalStockForProduct("콜라");
+
+        assertThat(totalStock).isEqualTo(
+                productManager.getPromotionStock("콜라") + productManager.getRegularStock("콜라")
+        );
+    }
+
 }
