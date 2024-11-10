@@ -14,17 +14,18 @@ public class PromotionDiscountServiceTest {
 
     private PromotionDiscountService promotionDiscountService;
     private OrderItemManager orderItemManager;
+    private ProductManager productManager;
 
     @BeforeEach
     void setUp() {
-        ProductManager productManager = ProductManager.load();
+        productManager = ProductManager.load();
         PromotionManager promotionManager = PromotionManager.load();
         promotionDiscountService = new PromotionDiscountService(productManager, promotionManager);
 
         orderItemManager = OrderItemManager.from(Map.of(
                 "콜라", 11,
                 "사이다", 4
-        ));
+        ),productManager);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class PromotionDiscountServiceTest {
                 "콜라", 5,
                 "사이다", 3,
                 "컵라면", 1
-        ));
+        ),productManager);
         List<OrderItem> canReceiveBonusItems = promotionDiscountService.findCanReceiveBonus(orderItemManager);
         assertThat(canReceiveBonusItems).hasSize(1);
         assertThat(canReceiveBonusItems.getFirst().getName()).isEqualTo("콜라");

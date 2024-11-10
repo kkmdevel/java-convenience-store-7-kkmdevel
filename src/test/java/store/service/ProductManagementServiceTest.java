@@ -23,7 +23,7 @@ public class ProductManagementServiceTest {
 
         orderItemManager = OrderItemManager.from(Map.of(
                 "콜라", 15
-        ));
+        ),productManager);
     }
 
     @Test

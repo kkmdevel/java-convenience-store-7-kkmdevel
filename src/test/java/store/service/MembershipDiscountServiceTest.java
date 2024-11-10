@@ -24,7 +24,7 @@ public class MembershipDiscountServiceTest {
                 "콜라", 10,
                 "사이다", 8,
                 "오렌지주스", 6
-        ));
+        ), productManager);
     }
 
     @Test

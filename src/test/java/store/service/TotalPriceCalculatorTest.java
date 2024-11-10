@@ -23,7 +23,7 @@ public class TotalPriceCalculatorTest {
         orderItemManager = OrderItemManager.from(Map.of(
                 "콜라", 5,
                 "사이다", 3
-        ));
+        ),productManager);
     }
 
     @Test
