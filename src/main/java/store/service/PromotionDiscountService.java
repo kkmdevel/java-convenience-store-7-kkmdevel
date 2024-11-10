@@ -11,6 +11,8 @@ import store.domain.ProductManager;
 import store.domain.PromotionManager;
 
 public class PromotionDiscountService {
+    private static final int REQUIRED_REMAINDER_FOR_BONUS = 1;
+
     private final ProductManager productManager;
     private final PromotionManager promotionManager;
     private final LocalDate currentDate;
@@ -23,13 +25,7 @@ public class PromotionDiscountService {
 
     public List<OrderItem> findCanReceiveBonus(OrderItemManager orderItemManager) {
         return orderItemManager.getItems().stream()
-                .filter(item -> {
-                    String promotion = productManager.findPromotion(item.getName());
-                    return !promotion.isEmpty() &&
-                            isBonusApplicable(item) &&
-                            item.getRequestedQuantity() % getPromotionQuantity(item) == getPromotionQuantity(item) - 1 &&
-                            item.getRequestedQuantity() + 1 <= productManager.getPromotionStock(item.getName());
-                })
+                .filter(this::canReceiveBonus)
                 .toList();
     }
 
@@ -50,6 +46,35 @@ public class PromotionDiscountService {
                 ));
     }
 
+    public int calculatePromotionDiscount(Map<String, Integer> bonuses) {
+        return bonuses.entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .mapToInt(this::calculateDiscountForEntry)
+                .sum();
+    }
+
+    private boolean canReceiveBonus(OrderItem item) {
+        String promotion = productManager.findPromotion(item.getName());
+        int promotionQuantity = getPromotionQuantity(item);
+        int promotionStock = productManager.getPromotionStock(item.getName());
+
+        return hasValidPromotion(promotion) &&
+                isBonusApplicable(item) &&
+                isNearBonusThreshold(item, promotionQuantity) &&
+                hasSufficientStock(item, promotionStock);
+    }
+
+    private boolean isBonusApplicable(OrderItem item) {
+        String promotionName = getPromotionName(item);
+        return promotionManager.isPromotionActive(promotionName, currentDate);
+    }
+
+    private int calculateBonusQuantity(OrderItem item) {
+        int promotionQuantity = getPromotionQuantity(item);
+        int maxPromotionQuantity = getMaxPromotionQuantity(item, promotionQuantity);
+        return Math.min(item.getRequestedQuantity() / promotionQuantity, maxPromotionQuantity / promotionQuantity);
+    }
+
     private int calculateRegularPriceForItem(OrderItem item, Map<String, Integer> bonuses) {
         int promotionStock = productManager.getPromotionStock(item.getName());
         int bonusQuantity = bonuses.getOrDefault(item.getName(), 0);
@@ -62,15 +87,10 @@ public class PromotionDiscountService {
         return requestedQuantity - totalPromotionQuantity;
     }
 
-    private boolean isBonusApplicable(OrderItem item) {
-        String promotionName = getPromotionName(item);
-        return promotionManager.isPromotionActive(promotionName, currentDate);
-    }
-
-    private int calculateBonusQuantity(OrderItem item) {
-        int promotionQuantity = getPromotionQuantity(item);
-        int maxPromotionQuantity = getMaxPromotionQuantity(item, promotionQuantity);
-        return Math.min(item.getRequestedQuantity() / promotionQuantity, maxPromotionQuantity / promotionQuantity);
+    private int calculateDiscountForEntry(Map.Entry<String, Integer> entry) {
+        String productName = entry.getKey();
+        int bonusQuantity = entry.getValue();
+        return productManager.calculatePrice(productName, bonusQuantity);
     }
 
     private int calculateTotalPromotionQuantity(int bonus, OrderItem item) {
@@ -86,6 +106,18 @@ public class PromotionDiscountService {
     private int getMaxPromotionQuantity(OrderItem item, int promotionQuantity) {
         int promotionStock = productManager.getPromotionStock(item.getName());
         return promotionStock - (promotionStock % promotionQuantity);
+    }
+
+    private boolean hasValidPromotion(String promotion) {
+        return !promotion.isEmpty();
+    }
+
+    private boolean isNearBonusThreshold(OrderItem item, int promotionQuantity) {
+        return item.getRequestedQuantity() % promotionQuantity == promotionQuantity - REQUIRED_REMAINDER_FOR_BONUS;
+    }
+
+    private boolean hasSufficientStock(OrderItem item, int promotionStock) {
+        return item.getRequestedQuantity() + 1 <= promotionStock;
     }
 
     private String getPromotionName(OrderItem item) {
