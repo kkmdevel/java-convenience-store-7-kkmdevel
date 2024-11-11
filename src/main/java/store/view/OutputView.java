@@ -110,6 +110,7 @@ public class OutputView {
     }
 
     public static void askToContinueShopping() {
+        printBlankLine();
         System.out.println(CONTINUE_SHOPPING.getMessage());
     }
 
