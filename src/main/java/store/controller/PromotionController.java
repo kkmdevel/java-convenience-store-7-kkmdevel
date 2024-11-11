@@ -1,6 +1,7 @@
 package store.controller;
 
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import store.domain.OrderItemManager;
 import store.domain.PromotionResult;
@@ -54,7 +55,12 @@ public class PromotionController {
     public void displayBonus(PromotionResult promotionResult) {
         Map<String, Integer> filteredBonusMap = promotionResult.getBonusMap().entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
         OutputView.printBonusItems(filteredBonusMap);
     }
 

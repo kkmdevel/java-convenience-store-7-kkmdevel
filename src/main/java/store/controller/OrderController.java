@@ -2,6 +2,7 @@ package store.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import store.domain.OrderItemManager;
 import store.domain.OrderItem;
@@ -37,7 +38,9 @@ public class OrderController {
         Map<String, Integer> purchasedItems = orderItemManager.getItems().stream()
                 .collect(Collectors.toMap(
                         OrderItem::getName,
-                        OrderItem::getRequestedQuantity
+                        OrderItem::getRequestedQuantity,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
                 ));
         OutputView.printOriginalPrice(purchasedItems, totalPrices);
     }

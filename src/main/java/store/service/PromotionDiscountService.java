@@ -4,6 +4,7 @@ import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import store.domain.OrderItem;
 import store.domain.OrderItemManager;
@@ -34,7 +35,9 @@ public class PromotionDiscountService {
                 .filter(this::isBonusApplicable)
                 .collect(Collectors.toMap(
                         OrderItem::getName,
-                        this::calculateBonusQuantity
+                        this::calculateBonusQuantity,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
                 ));
     }
 
@@ -42,9 +45,12 @@ public class PromotionDiscountService {
         return orderItemManager.getItems().stream()
                 .collect(Collectors.toMap(
                         OrderItem::getName,
-                        item -> calculateRegularPriceForItem(item, bonuses)
+                        item -> calculateRegularPriceForItem(item, bonuses),
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
                 ));
     }
+
 
     public int calculatePromotionDiscount(Map<String, Integer> bonuses) {
         return bonuses.entrySet().stream()
