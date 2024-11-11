@@ -29,6 +29,7 @@ public class StoreController {
     public void start() {
         do {
             executeShoppingCycle();
+            OutputView.printBlankLine();
         } while (discountAndPaymentController.askToContinueShopping());
     }
 
