@@ -3,7 +3,6 @@ package store.domain;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class OrderItemManager {
     private final List<OrderItem> items;
@@ -17,7 +16,7 @@ public class OrderItemManager {
 
         List<OrderItem> items = orderMap.entrySet().stream()
                 .map(entry -> OrderItem.of(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                .toList();
         return new OrderItemManager(items);
     }
 
