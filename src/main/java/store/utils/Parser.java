@@ -39,6 +39,7 @@ public final class Parser {
             List<String> parts = parseAndValidateProduct(product);
             String name = parts.get(0).trim();
             int quantity = parseStringToInt(parts.get(1).trim());
+            validateDuplicateName(orderItems, name);
             orderItems.put(name, quantity);
         });
 
@@ -60,6 +61,12 @@ public final class Parser {
         return parts;
     }
 
+    private static void validateDuplicateName(Map<String, Integer> orderItems, String name) {
+        if (orderItems.containsKey(name)) {
+            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.");
+        }
+    }
+
     public static boolean parseYesNo(String input) {
         if (input.equalsIgnoreCase("Y")) return true;
         if (input.equalsIgnoreCase("N")) return false;
@@ -69,7 +76,7 @@ public final class Parser {
 
     private static void validateIsEmpty(String input) {
         if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
+            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.");
         }
     }
 }
