@@ -87,7 +87,7 @@ public class PromotionDiscountService {
         int totalPromotionQuantity = calculateTotalPromotionQuantity(bonusQuantity, item);
         int requestedQuantity = item.getRequestedQuantity();
 
-        if (promotionStock > requestedQuantity || getPromotionName(item).isEmpty()) {
+        if ( promotionStock == 0 || promotionStock > requestedQuantity || getPromotionName(item).isEmpty()) {
             return 0;
         }
         return requestedQuantity - totalPromotionQuantity;
