@@ -12,7 +12,8 @@ import static store.exception.ExceptionMessage.ERROR_INVALID_FORMAT;
 
 public final class Parser {
 
-    private static final String PATTERN = "^\\[[a-zA-Z가-힣0-9]+-\\d+](,\\s*\\[[a-zA-Z가-힣0-9]+-\\d+])*$";
+    private static final String PATTERN = "^\\[[a-zA-Z가-힣0-9]+-\\d+](,\\[[a-zA-Z가-힣0-9]+-\\d+])*$";
+
 
     private Parser() {
     }
