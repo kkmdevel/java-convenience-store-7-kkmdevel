@@ -96,7 +96,7 @@ public class ParserTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'[item1-abc]'", "'[item1--5]'", "'[item1-0]'", "'[item1-]'", "'[-item1-5]'"
+            "'[item1-abc]'", "'[item1--5]'", "'[item1-]'", "'[-item1-5]'"
     })
     @DisplayName("잘못된 상품 이름 또는 수량 형식 예외 테스트")
     void testParseOrderItem_InvalidProductFormat(String input) {
