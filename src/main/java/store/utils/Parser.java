@@ -32,8 +32,9 @@ public final class Parser {
 
     public static Map<String, Integer> parseOrderItem(String input) {
         validateIsEmpty(input);
-        Map<String, Integer> orderItems = new LinkedHashMap<>();
+        validateBracketsFormat(input);
 
+        Map<String, Integer> orderItems = new LinkedHashMap<>();
         Arrays.asList(input.split(",")).forEach(product -> {
             List<String> parts = parseAndValidateProduct(product);
             String name = parts.get(0).trim();
@@ -44,6 +45,12 @@ public final class Parser {
         return orderItems;
     }
 
+    private static void validateBracketsFormat(String input) {
+        if (!input.matches("(\\[.*?],\\s*)*\\[.*?]")) {
+            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.");
+        }
+    }
+
     private static List<String> parseAndValidateProduct(String product) {
         String cleanedProduct = product.trim().replaceAll("[\\[\\]]", "");
         List<String> parts = Arrays.asList(cleanedProduct.split("-"));
@@ -52,7 +59,6 @@ public final class Parser {
         }
         return parts;
     }
-
 
     public static boolean parseYesNo(String input) {
         if (input.equalsIgnoreCase("Y")) return true;
