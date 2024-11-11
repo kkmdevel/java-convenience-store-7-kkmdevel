@@ -1,5 +1,7 @@
 package store.domain;
 
+import static store.exception.ExceptionMessage.ERROR_INVALID_FORMAT;
+
 public class OrderItem {
     private final String name;
     private int quantity;
@@ -17,13 +19,13 @@ public class OrderItem {
 
     private static void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.");
+            throw new IllegalArgumentException(ERROR_INVALID_FORMAT.toString());
         }
     }
 
     private static void validateQuantity(int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.");
+            throw new IllegalArgumentException(ERROR_INVALID_FORMAT.toString());
         }
     }
 

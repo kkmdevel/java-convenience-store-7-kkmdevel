@@ -1,5 +1,8 @@
 package store.domain;
 
+import static store.exception.ExceptionMessage.ERROR_STOCK_LIMIT;
+import static store.exception.ExceptionMessage.NO_EXIST_PRODUCT;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +31,7 @@ public class OrderItemManager {
     private static void validateProductNames(Map<String, Integer> orderMap, ProductManager productManager) {
         for (String productName : orderMap.keySet()) {
             if (!productManager.isProductAvailable(productName)) {
-                throw new IllegalArgumentException("[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.");
+                throw new IllegalArgumentException(NO_EXIST_PRODUCT.toString());
             }
         }
     }
@@ -40,7 +43,7 @@ public class OrderItemManager {
             int availableStock = productManager.calculateTotalStockForProduct(productName);
 
             if (requestedQuantity > availableStock) {
-                throw new IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
+                throw new IllegalArgumentException(ERROR_STOCK_LIMIT.toString());
             }
         }
     }
