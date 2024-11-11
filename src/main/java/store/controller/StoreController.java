@@ -50,6 +50,7 @@ public class StoreController {
 
     private void processOrderAndCalculateDiscounts(OrderItemManager orderItemManager, PromotionResult promotionResult) {
         applyPromotionsAndAdjustments(orderItemManager, promotionResult);
+        if(orderItemManager.getItems().isEmpty()) return;
         int membershipDiscountAmount = askAndCalculateMembershipDiscount(orderItemManager, promotionResult);
         displayOrderDetails(orderItemManager);
         displayDiscountsAndPayableAmount(orderItemManager, promotionResult, membershipDiscountAmount);
