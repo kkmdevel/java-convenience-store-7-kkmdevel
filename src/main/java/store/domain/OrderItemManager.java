@@ -3,12 +3,13 @@ package store.domain;
 import static store.exception.ExceptionMessage.ERROR_STOCK_LIMIT;
 import static store.exception.ExceptionMessage.NO_EXIST_PRODUCT;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class OrderItemManager {
-    private final List<OrderItem> items;
+    private List<OrderItem> items;
 
     private OrderItemManager(List<OrderItem> items) {
         this.items = items;
@@ -60,9 +61,16 @@ public class OrderItemManager {
     }
 
     public void updateOrderItemAdjustment(String productName, int quantity) {
-        items.stream()
+        List<OrderItem> mutableItems = new ArrayList<>(items);
+        mutableItems.stream()
                 .filter(item -> item.hasName(productName))
                 .findFirst()
-                .ifPresent(item -> item.adjustmentQuantity(quantity));
+                .ifPresent(item -> {
+                    item.adjustmentQuantity(quantity);
+                    if (item.getRequestedQuantity() <= 0) {
+                        mutableItems.remove(item); // 수량이 0 이하인 경우 제거
+                    }
+                });
+        items = mutableItems;
     }
 }
